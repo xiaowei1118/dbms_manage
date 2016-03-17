@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>管理系统</title>
+	<link rel="stylesheet" type="text/css" href="/themes/bootstrap/easyui.css">
+	<link rel="stylesheet" type="text/css" href="/themes/icon.css">
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/sui.min.js"></script>
+	<script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="/js/easyui-lang-zh_CN.js"></script>
+  
+  <script type="text/javascript" src="/js/knockout.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/css/sui.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/sui-append.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false" style="height:60px;background:#cfa972
+;padding:10px">
+		<h1 style="height:8px;line-height:8px">IDP 管理系统</h1>
+	</div>
+	<div data-options="region:'west',split:true,title:'导航'" style="width:150px;padding:10px;">
+		<ul id="tree" class="easyui-tree" data-options="url:'/data/left_tree.json',method:'get',animate:true,dnd:true"></ul>
+	</div>
+	<div data-options="region:'south',border:false" style="height:50px;background:#cfa972
+;padding:10px;">
+		<div style="text-align:center">
+		   copyright@苏州百智通信息技术有限公司 All Rights Reserved.
+		</div>
+	</div>
+	<div data-options="region:'center',title:'内容'">
+		<div id="tabs" class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+			<div title="首页" data-options="href:'_content.html'" style="padding:10px">
+			</div>
+
+		</div>
+	</div>
+	<script type="text/javascript">
+	    $(function(){
+	    	$(".easyui-tree").tree({
+	    		onClick:function(node){
+	    			if($("#tabs").tabs('getTab',node.text)){  //判断tab是否已经存在
+	    				$("#tabs").tabs('select',node.text);
+	    			}else{                           //存在切换到该tab		
+              var content = '<iframe scrolling="no" frameborder="0"  src="'+node.attributes.url+'" style="width:100%;height:100%;"></iframe>';
+
+	    				$('#tabs').tabs('add',{        //不存在添加tab
+	    				    title:node.text,
+	    				    content:content,
+	    				    closable:true,
+	    				});
+	    			}        	
+	    		}
+	    	});
+	    });
+
+	</script>
+</body>
+</html>

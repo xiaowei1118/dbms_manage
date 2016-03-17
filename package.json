@@ -1,0 +1,18 @@
+{
+  "name": "IDP",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node test.js"
+  },
+  "description": "IDP 2.0",
+  "author": {
+    "name": "andrew",
+    "email": "ping.gu@qq.com"
+  },
+  "dependencies": {
+    "react": "^0.14.3",
+    "swig": "^1.4.2",
+    "underscore": "^1.8.3"
+  }
+}

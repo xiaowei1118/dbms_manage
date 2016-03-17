@@ -1,0 +1,36 @@
+[
+    {
+        "id": 1,
+        "text": "数据表管理",
+        "children": [
+            {
+                "id": 12,
+                "text": "实体表",
+                "attributes": {
+                    "url": "entity.html"
+                }
+            },
+            {
+                "id": 13,
+                "text": "枚举表",
+                "attributes": {
+                    "url": "enum.html"
+                }
+            },
+            {
+                "id": 14,
+                "text": "接口管理",
+                "attributes": {
+                    "url": "api.html"
+                }
+            },
+            {
+                "id": 15,
+                "text": "接口组管理",
+                "attributes": {
+                    "url": "group_api.html"
+                }
+            }
+        ]
+    }
+]

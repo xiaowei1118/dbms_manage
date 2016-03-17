@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <script type="text/ecmascript" src="/jqgrid/js/jquery-1.11.0.min.js"></script> 
+    <script type="text/ecmascript" src="/jqgrid/src/i18n/grid.locale-cn.js"></script>
+    <script type="text/ecmascript" src="/jqgrid/js/jquery.jqGrid.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> 
+    <link rel="stylesheet" type="text/css" media="screen" href="/jqgrid/css/ui.jqgrid-bootstrap.css" />
+    <script src="//cdn.bootcss.com/react/0.14.0/react.js"></script>
+    <script src="//cdn.bootcss.com/react/0.14.0/react-dom.js"></script>
+    <script src="/js/build/jqgrid.js"></script>  <!-- 我的表单控件库 -->
+    <script>
+        $.jgrid.defaults.width = 780;
+        $.jgrid.defaults.responsive = true;
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+    </script>
+    
+    <style type="text/css">
+        .fr{
+            float: right;
+        }
+        .fl{
+            float:left;
+        }
+        .detail-grid{
+            margin-left: 30px;
+        }
+    </style>
+</head>
+<body>
+<div style="margin-left:200px;margin-top:20px">
+    <div id="masterGrid" class="fl master-grid">
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+  
+    <div id="detailsPlaceholder" class="detail-grid fl">
+        <table id="jqGridDetails"></table>
+        <div id="jqGridDetailsPager"></div>
+    </div>
+</div>
+    <script type="text/javascript"> 
+        var editData=[];
+        $(document).ready(function () {
+            $("#jqGrid").jqGrid({
+                url: '/get/z_entity?_field=fname,ftype,ftablename',
+                datatype: "json",
+                colModel: [
+                    { label: 'ID', name: 'uid',index:'uid', key: true, width: 75},
+                    { label: '实体名称', name: 'fname',index:'fname', width: 150},
+                    { label: '实体表名称', name: 'ftablename',index:'ftablename', width: 150},
+                    { label: '实体类型', name: 'ftype', index:'ftype',width: 150},
+                ],
+                width: 780,
+                height: 300,
+                rowNum: 10,
+                sortname:'uid',
+                viewrecords: true,
+                loadonce: true,
+                caption: '实体表',
+                onSelectRow: function(rowid, selected) {
+                    console.log(selected);
+                    if(rowid != null) {
+                        jQuery("#jqGridDetails").jqGrid('setGridParam',{url: "/get/z_entityproperty?_field=fname,fdatatype,fdbname&fentityuid="+rowid,datatype: 'json'}); 
+                        jQuery("#jqGridDetails").trigger("reloadGrid");
+                    }                   
+                }, 
+                onSortCol : clearSelection,
+                onPaging : clearSelection,
+                pager: "#jqGridPager"
+            });
+        });
+
+        $("#jqGridDetails").jqGrid({
+            url: '',
+            mtype: "GET",
+            datatype: "json",
+            page: 1,
+            colModel: [
+                { label: '属性id', name: 'uid', index:'uid',key:true,width: 75,editable:true},
+                { label: '属性字段', name: 'fdbname', index:'fdbname',width: 100,editable:true },
+                { label: '属性名称', name: 'fname', index:'fname',width: 100,editable:true },  
+                { label: '数据类型', name: 'fdatatype', index:'fdatatype',width: 100,editable:true },     
+            ],
+            width: 780,
+            rowNum: 5,
+            loadonce: true,
+            height: 300,
+            viewrecords: true,
+            onSelectRow: editRow,
+            caption: '属性表',
+            pager: "#jqGridDetailsPager",
+            editurl:"/update/z_entityproperty",
+        });
+
+        function clearSelection() {
+            jQuery("#jqGridDetails").jqGrid('setGridParam',{url: "empty.json", datatype: 'json'}); 
+            jQuery("#jqGridDetails").jqGrid('setCaption', '属性表');
+            jQuery("#jqGridDetails").trigger("reloadGrid");
+            
+        }
+
+        var lastSelection;
+
+        function editRow(id) {
+             var grid = $("#jqGridDetails");
+            if (id && id !== lastSelection) {
+                console.log(lastSelection);
+                //var grid = $("#jqGridDetails");
+                grid.jqGrid('saveRow',lastSelection,{errorfunc:function(rowid,xhr){
+                    
+                }});
+                //grid.jqGrid('restoreRow',lastSelection);
+                grid.jqGrid('editRow',id, {keys: true} );
+                lastSelection = id;
+            }
+        }
+
+        $('#jqGridDetails').navGrid("#jqGridDetailsPager", {edit: false, add: false, del: false, refresh: false, view: false});
+
+        $('#jqGridDetails').inlineNav('#jqGridDetailsPager',
+        { 
+            edit: false, 
+            add: true, 
+            del: true, 
+            cancel: true,
+            editParams: {
+                keys: true,
+            },
+            addParams: {
+                keys: true
+            }
+        });
+    // });
+    </script>
+</body>
+</html>

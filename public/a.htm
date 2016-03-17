@@ -1,0 +1,65 @@
+<html>
+<script type="text/javascript" src="/file/jquery-1.4.1.min.js"></script>
+<script>
+$(document).ready(function(){
+	var 开始=false;
+	var id=0;
+    $(".bnt0").click(function(){
+        $this=$(this);
+		if(开始){
+			$this.html('开始');
+			clearInterval(id);
+			开始=false;
+		}else{
+			开始=true;
+			$this.html('结束');
+			var count=0;
+			var sum=0;
+			var $item=$('<div></div>');
+			var start=new Date();
+			$('.info').append($item);
+			id=setInterval(function(){
+				var dt0=new Date();
+				$.post("/get/1?_field=fname",{time:'aaa',res:"123"},function(data){
+					var sp=new Date()-dt0;
+					sum+=sp;
+					count++;
+					$item.html("count:"+count+";mintime:"+(sum/count)+";time:"+(new Date()-start));
+				})
+			},1)
+		}
+    });
+	$(".bnt").click(function(){
+        $this=$(this);
+		if(开始){
+			$this.html('开始');
+			clearInterval(id);
+			开始=false;
+		}else{
+			开始=true;
+			$this.html('结束');
+			var count=0;
+			var sum=0;
+			var $item=$('<div></div>');
+			var start=new Date();
+			$('.info').append($item);
+			
+			id=setInterval(function(){
+				var dt0=new Date();
+				count++;
+				$.post("/get/addconn",{id:count},function(data){
+					$('.info').append("Time Passed:"+(new Date()-dt0)+" "+data);
+				});
+				$item.html("count:"+count);
+			},1)
+		}
+    });
+	$(".bntmsg").click(function(){
+		$.post("/get/endconn",{id:$('.id').val(),msg:$('.msg').val()},function(data){
+					
+		});
+	})
+});
+</script>
+<div class="bnt" >开始</div><div  >ID:<input class="id" />MSG:<input class="msg" /><span class="bntmsg">发送</span></div><div class="info"></div>
+</html>

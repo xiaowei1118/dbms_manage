@@ -1,0 +1,19 @@
+{
+  "name": "idp_server",
+  "description": "Node.js idp middleware",
+  "version": "0.0.1",
+  "contributors": [
+    {
+      "name": "andrew gu",
+      "email": "ping.gu@qq.com"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+
+  },
+  "files": [
+    "lib/",
+    "index.js"
+  ]
+}

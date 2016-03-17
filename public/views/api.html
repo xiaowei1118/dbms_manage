@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>api</title>
+  <meta chaset="utf-8">
+  <link rel="stylesheet" type="text/css" href="/themes/bootstrap/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/themes/icon.css">
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/sui.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="/js/easyui-lang-zh_CN.js"></script>
+  
+  <script type="text/javascript" src="/js/knockout.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/css/sui.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/sui-append.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+   <div class="easyui-layout" data-options="fit:true">
+       <div data-options="region:'north',split:true" style="height:40px;border:none">
+       	 <h3 style="height:10px;line-height:10px;margin-left:20px">以下为联动表格</h3>
+       </div>
+       <div data-options="region:'west',split:true" style="width:900px">
+          <table id="table_api">
+       	   </table>
+       </div>
+       <div id="api_tb">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addApi();">添加</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyApi();">删除</a>
+       </div>
+
+       <div data-options="region:'center'">
+          <fieldset class="form-fieldset" id="api_fieldset">
+            <legend>接口添加</legend>
+                <form class="sui-form form-horizontal margin-top10" id="api_form">     
+                 <div class="control-group none">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b> 
+                     apiId:
+                   </label>
+                   <div class="controls">
+                     <input type="text" name="uid" value="0">
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b> 
+                     api名称:
+                   </label>
+                   <div class="controls">
+                     <input type="text" name="fname" required>
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b>api描述:</label>
+                   <div class="controls api_desc">
+                       <input type="text" class="input-xxlarge" name="fdes" required>
+                   </div>
+                 </div>
+            
+                 <div class="control-group">
+                   <label class="control-label"><b style="color: #f00;">*</b>表名：
+                   </label>
+                   <div class="controls">
+                         <input id="table_name" name="ffrom"/>
+                   </div>
+                 </div>
+                 
+                 <div class="control-group">
+                   <label class="control-label"><b style="color: #f00;">*</b>字段：
+                   </label>
+                   <div class="controls">
+                         <input id="field" name="field" type="text"/>
+                         <input class="none" name="ffield" type="text"/>
+                         <input class="none" name="api_field_uid" type="text"/>
+                   </div>
+                 </div>
+                 
+               <!--<div class="control-group">
+                 <label class="control-label"><b style="color: #f00;">*</b>排序：
+                 </label>
+                 <div id="sort" class="controls">
+                       <div class="deal-sort-button  deal-button">
+                         <button id="add-sort" type="button" class="sui-btn btn-primary">添加</button>
+                       </div>
+                       <div class="input-line">
+                           <input name="sort" type="text"/>
+                           <span class="sui-dropdown dropdown-bordered"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span name="sort-text">asc</span><i class="caret"></i></a>
+                               <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                                 <li role="presentation" class="active"><a role="menuitem" tabindex="-1" onclick="sort_select(this);" data-v="asc">asc</a></li>
+                                 <li role="presentation"><a role="menuitem" tabindex="-1" onclick="sort_select(this);" data-v="desc">desc</a></li>
+                               </ul>
+                           </span></span>
+                           <button id="delete-con"type="button" class="sui-btn btn-primary" onclick="delete_sort(this);">删除</button>
+                       </div>   
+                       <div class="">
+                          <input type="text" name="fsort"/>
+                       </div>         
+                 </div>
+               </div> -->
+
+                 <div class="control-group">
+                    <label class="control-label"><b style="color: #f00;">*</b>条件：</label>
+                    <div id="condition" class="controls">
+                      <div class="deal-button">
+                         <button id="add-con" type="button" class="sui-btn btn-primary">添加</button>
+                      </div>
+                      
+                      <div class="input-line">
+                         <input type="text" name="where_field"/>
+                         <span class="sui-dropdown dropdown-bordered"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span name="con-text">等于</span><i class="caret"></i></a>
+                             <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+                               <li role="presentation" class="active" data-v="=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" href="#">等于</a></li>
+                               <li role="presentation" data-v=">" onclick="con_select(this);"><a role="menuitem" tabindex="-1">大于</a></li>
+                               <li role="presentation" data-v="<" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >小于</a></li>
+                               <li role="presentation" data-v=">=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >大于等于</a></li>
+                               <li role="presentation" data-v="<=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >小于等于</a></li>
+                             </ul>
+                         </span></span>
+                         <input type="text" name="where_type" class="math_type none" value="=">
+                         <input type="text" name="where_value"/><button id="delete-con"type="button" class="sui-btn btn-primary margin-left10" onclick="delete_con(this);">删除</button>
+                      </div>
+                    </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label"><b style="color: #f00;">*</b>是否启用：
+                   </label>
+                   <div class="controls">
+                         <input type="radio" name="fstatus" type="text" value="1" checked/>启用
+                         <input type="radio" name="fstatus" type="text" value="0" />禁用
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label"></label>
+                   <div class="controls">
+                     <button id="api_commit" type="submit" class="sui-btn btn-primary">提交</button>
+                     <button type="reset" class="sui-btn">重置</button>
+                   </div>
+                 </div>        
+                 
+               </form>
+          </fieldset>
+       	  
+       </div>
+   </div>
+   <script type="text/javascript">
+        $(function(){
+            $('#add-con').on('click',function(){
+                $.get('/data/con_line.html',function(data){
+                    $('#condition').append(data);       
+                });
+            });
+            /*$('#add-sort').on('click',function(){
+                $.get('/data/sort_line.html',function(data){
+                  $('#sort').append(data);
+                })
+            });*/
+
+
+            $("#api_form").submit(function(){
+                event.preventDefault();
+                    //这里是要执行的代码
+                var fieldsNode=$('#field').combotree('tree').tree('getChecked');
+                var ffield=[];
+                for(var item of fieldsNode){
+                  if(item.id!=0){
+                    ffield.push(item.attributes.fdbname);
+                  } 
+                }
+                $('input[name="ffield"]').val(JSON.stringify(ffield));
+                var tree=$('#field').combotree('tree');
+                
+                var treeData=[];
+                tree.tree('getRoots').forEach(function(item){          
+                   treeData.push(tree.tree('getData',item.target));
+                });
+
+                $.ajax({
+                  url:'/admin/api/z_entity',
+                  method:'post',
+                  dataType:'json',
+                  data: $("#api_form").serialize(),
+                  success:function(result){
+                      if (result.code){
+                          $('#table_api').datagrid('reload'); 
+                          var uid=$('input[name="uid"]').val();
+                          console.log(uid);
+                          var url;
+                          var fuid;
+                          if(uid=="0"){
+                            url="/add/z_api_field";
+                            fapiid=result.msg;
+                          }else{
+                            url="/update/z_api_field";
+                            fapiid=uid;
+                          }
+                          console.log(url);
+                          $.get('/get/z_api_field?fapiid='+fapiid,function(data){
+                            if(data.length==1){
+                              fuid=data[0].uid;
+                            }
+                              $.ajax({
+                                  url:url,
+                                  type:'post',
+                                  data:{uid:fuid,fapiid,ffieldtree:JSON.stringify(treeData)},
+                                  success:function(data){
+
+                                  }
+                              });  
+                          },'json');
+                           
+                      } else {
+                          $.messager.show({   
+                              title: 'Error',
+                              msg: result.msg
+                          });
+                      }
+                  }
+                });      
+            });
+          });
+           
+        function delete_con(e){
+           $(e).parent().remove();  
+        }
+       /* function delete_sort(e){
+           $(e).parent().css("display","none");
+        }*/
+        function con_select(e){
+            $(e).parent().parent().parent().find("span[name='con-text']").text($(e).text());
+            $(e).parent().parent().parent().parent().find('input.math_type').val($(e).attr('data-v'));
+            $(e).addClass('active');
+            $(e).siblings().removeClass('active');
+        }
+        /*function sort_select(e){
+            $(e).parent().parent().parent().find("span[name='sort-text']").text($(e).text());
+            $(e).parent().addClass('active');
+            $(e).parent().siblings().removeClass('active');
+        }*/
+
+   </script>
+
+   <script type="text/javascript">
+        var tableData=undefined;
+        
+        $.ajax({
+           url:'/get/z_entity?_field=fname,ftablename&ftype=!0',//&ftype=>1
+           type:'post',
+           dataType:'json',
+           success:function(data){
+              tableData=data;
+              $("#table_name").combobox('loadData',data);
+           }
+        });
+       
+        $("#table_name").combobox({
+            valueField:'ftablename',
+            textField:'fname',
+            onSelect:function(record){
+                 $("#field").combotree({
+                    url:"/admin/getFieldWithQuote/z_entityproperty?uid="+record.uid
+                 });
+            },
+            formatter: function(row){
+              var opts = $(this).combobox('options');
+              return row[opts.textField];
+            }
+         });
+         
+         $("#field").combotree({
+            checkbox:true,
+            lines:true,
+            multiple:true,
+            method:"get",
+            required:true,
+            onExpand:function(node){ 
+                 $tree=$("#field").combotree('tree');          
+                 if(node.children.length==1){
+                    $.get('/admin/getFieldWithQuote/z_entityproperty?uid='+node.attributes.fentityuid1,function(data){
+                        for(var i=0;i<data.length;i=i+1){
+                          data[i]['attributes']['fdbname']=node.attributes.fdbname+"_"+data[i]['attributes']['fdbname'];
+                        }
+                        $("#field").combotree('tree').tree('append',{
+                            parent:node.target,
+                            data:data,
+                       });
+                         var nodes=$("#field").combotree('tree').tree('getChildren',node.target);   
+                         $("#field").combotree('tree').tree('remove',nodes[0].target);
+                    },'json');
+
+                 }                                         
+            }
+         });
+    
+   		  $('#table_api').datagrid({
+   		    url:'/get/z_api_config?_field=fname,fdes,ffield,ffrom,fcondition,fstatus,fsort',
+   		    idField:'uid',
+   		    fit:true,
+   		    remoteSort:false,
+   		    fitColumns:false,
+   		    singleSelect:true,
+   		    pagination:true, //客户端分页
+   		    pageSize:30,
+   		    pageList:[20,30,40,50],
+   		    toolbar:"#api_tb",
+   		    columns:[[
+   		        {field:'uid',title:'ID',width:80,sortable:true},
+   		        {field:'fname',title:'名称',width:100,sortable:true},
+   		        {field:'fdes',title:'描述',width:100,sortable:true},
+   		        {field:'ffield',title:'字段',width:100,sortable:true,},
+   		        {field:'ffrom',title:'表来源',width:100,sortable:true},
+   		        {field:'fcondition',title:'条件',width:100,sortable:true},
+              {field:'fsort',title:'排序',width:100,sortable:true},
+   		        {field:'fstatus',title:'是否启用',width:100,sortable:true,formatter:boolFormatter},
+   		    ]],
+   		    onClickRow:function(index,row){
+              $("#api_fieldset legend").text("接口编辑");
+              for(var key in row){
+                  if(key!="fstatus"){
+                    $('input[name='+key+']').val(row[key]);
+                  }else{
+                    console.log(row[key]);
+                    $('input[name="fstatus"]').eq(1-row[key]).attr("checked",true);
+                  }
+               }
+              $("#table_name").combobox('setValue',row.ffrom);
+              $("#field").combotree('loadData',[]);
+              for(var key in tableData){
+                if(tableData[key]['ftablename'].toLowerCase()==row['ffrom'].toLowerCase()){      
+                    $("#field").combotree({     //获取保存的字段    
+                          url:"/admin/getApiField?_field=ffieldtree&fapiid="+row.uid,       
+                    });
+                 }
+              }
+
+              $("input[name='field']").val(row.ffield);
+
+              //为条件赋值
+              var apiCondition=eval("("+row.fcondition+")"); 
+              $('#condition .input-line').remove();
+               
+              $.get('/data/con_line_2.html',function(data){
+                  for(var con of apiCondition){
+                    var htmlData=data;
+                    var type_value;
+                    if(con['type']=="="){
+                      type_value='等于';
+                    }else if(con['type']=="<"){
+                      type_value="小于";
+                    }else if(con['type']==">"){
+                      type_value="大于";
+                    }else if(con['type']==">="){
+                      type_value="大于等于";
+                    }else if(con['type']=="<="){
+                      type_value="小于等于";
+                    }
+                    htmlData=htmlData.replace("#where_type",con['type']).replace('#where_field',con['field']).replace('#where_value',con['value']).replace("#type_value",type_value);
+                   
+                    $('#condition').append(htmlData);
+                 }        
+              });
+              
+   		    },
+   		    loadFilter:pagerFilter
+   		});
+		 
+     function destroyApi(){
+        var row = $('#table_api').datagrid('getSelected');
+        $.ajax({
+            url:"/delete/z_api_config?uid="+row.uid,
+            dataType:"json",
+            type:'get',
+            success:function(result){
+                if (result.code){
+                    $('#table_api').datagrid('reload');    
+                    $.get("/delete/z_api_field?fapiid="+row.uid,function(data){
+                      
+                    });  
+                } else {
+                    $.messager.show({   
+                        title: 'Error',
+                        msg: result.msg
+                    });
+                }
+            }
+        });
+     }
+
+     function addApi(){
+       $("#api_form")[0].reset();
+       $("#api_fieldset legend").text("接口添加");
+       $("#condition .input-line").remove();
+
+
+     }
+      function boolFormatter(val,row){
+        if(val=="1"){
+          return "是";
+        }else if(val=="0"){
+          return "否";
+        }else{
+          return "";
+        }
+      }
+
+      function pagerFilter(data){
+          if (typeof data.length == 'number' && typeof data.splice == 'function'){
+            data = {
+              total: data.length,
+              rows: data
+            }
+          }
+
+          var dg = $(this);
+          var opts = dg.datagrid('options');
+          var pager = dg.datagrid('getPager');
+          pager.pagination({
+            onSelectPage:function(pageNum, pageSize){
+              opts.pageNumber = pageNum;
+              opts.pageSize = pageSize;
+              pager.pagination('refresh',{
+                pageNumber:pageNum,
+                pageSize:pageSize
+              });
+              dg.datagrid('loadData',data);
+            }
+          });
+
+          if (!data.originalRows){
+            data.originalRows = (data.rows);
+          }
+          var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+          var end = start + parseInt(opts.pageSize);
+          data.rows = (data.originalRows.slice(start, end));
+          return data;
+        }
+</script>
+</body>
+</html>

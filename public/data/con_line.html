@@ -1,0 +1,14 @@
+<div class="input-line">
+ <input type="text" name="where_field"/>
+ <span class="sui-dropdown dropdown-bordered"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span name="con-text">等于</span><i class="caret"></i></a>
+     <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu">
+       <li role="presentation" class="active" data-v="=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" href="#">等于</a></li>
+       <li role="presentation" data-v=">" onclick="con_select(this);"><a role="menuitem" tabindex="-1">大于</a></li>
+       <li role="presentation" data-v="<" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >小于</a></li>
+       <li role="presentation" data-v=">=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >大于等于</a></li>
+       <li role="presentation" data-v="<=" onclick="con_select(this);"><a role="menuitem" tabindex="-1" >小于等于</a></li>
+     </ul>
+ </span></span>
+ <input type="text" name="where_type" class="math_type none" value="=">
+ <input type="text" name="where_value"/><button type="button" class="sui-btn btn-primary margin-left10" onclick="delete_con(this);">删除</button>
+</div>

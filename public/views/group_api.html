@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>组合api</title>
+  <meta chaset="utf-8">
+  <link rel="stylesheet" type="text/css" href="/themes/bootstrap/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/themes/icon.css">
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/sui.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="/js/easyui-lang-zh_CN.js"></script>
+  
+  <script type="text/javascript" src="/js/knockout.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/css/sui.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/sui-append.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+       <div data-options="region:'north',split:true" style="height:40px;border:none">
+         <h3 style="height:10px;line-height:10px;margin-left:20px">以下为联动表格</h3>
+       </div>
+       <div data-options="region:'west',split:true" style="width:900px">
+          <table id="table_api_group">
+           </table>
+       </div>
+       <div id="group_api_tb">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" data-bind="click:addApiGroup">添加</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyApiGroup();">删除</a>
+       </div>
+
+       <div data-options="region:'center'">
+          <fieldset class="form-fieldset" id="api_group_fieldset">
+            <legend>接口添加</legend>
+                <form class="sui-form form-horizontal margin-top10" id="api_group_form" data-bind="submit:submitApiGroup">     
+                 <div class="control-group none">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b> 
+                     apiId:
+                   </label>
+                   <div class="controls">
+                     <input type="text" name="uid" value="0">
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b> 
+                     api名称:
+                   </label>
+                   <div class="controls">
+                     <input type="text" name="fname" required>
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label v-top"><b style="color: #f00;">*</b>api描述:</label>
+                   <div class="controls api_desc">
+                       <input type="text" class="input-xxlarge" name="fdescription" required>
+                   </div>
+                 </div>
+            
+                 <div class="control-group">
+                   <label class="control-label"><b style="color: #f00;">*</b>组合api:
+                   </label>
+                   <div class="controls">
+                        <span class="sui-dropdown dropdown-bordered"><span class="dropdown-inner"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle"><span id="api_item" name="con-text">请选择api...</span><i class="caret"></i></a>
+                           <ul role="menu" aria-labelledby="drop1" class="sui-dropdown-menu" data-bind="foreach:apis">
+                             <li role="presentation" class="active" data-bind="{text:fname,click:$parent.selectApi}"></li>
+                           </ul>
+                       </span></span>   
+                       <!-- ko foreach: selectApis -->
+                       <span class="sui-msg tag color4"><span data-bind="text:fname"></span><button type="button" class="sui-close" data-bind="click:$parent.destroyApi">×</button></span> 
+                       <!-- /ko -->
+                       <input type="text" name="fapiarr" class="none" data-bind="textInput:api_array"/>
+                   </div>
+                 </div>        
+                 
+                 <div class="control-group">
+                   <label class="control-label"><b style="color: #f00;">*</b>是否启用：
+                   </label>
+                   <div class="controls">
+                         <input type="radio" name="fstatus"  value="1" checked/>启用
+                         <input type="radio" name="fstatus"  value="0" />禁用
+                   </div>
+                 </div>
+                 <div class="control-group">
+                   <label class="control-label"></label>
+                   <div class="controls">
+                     <button  type="submit" class="sui-btn btn-primary">提交</button>
+                     <button type="reset" class="sui-btn">重置</button>
+                   </div>
+                 </div>        
+                 
+               </form>
+          </fieldset>
+       </div>
+   </div>
+<script type="text/javascript">
+    var viewModel = new function() {
+        var self=this;
+        self.apis=ko.observableArray([]); 
+        self.selectApis=ko.observableArray([]);
+
+        self.loadAllApis=function(){
+          $.getJSON('/get/z_api_config?_field=fname',function(data){
+              self.apis(data);
+          });
+        };
+        self.selectApi=function(item){
+            $("#api_item").text(item.fname);
+            var flag=0;
+            var hasSelectApis=self.selectApis();
+            for(var api of hasSelectApis){
+               if(item.fname==api.fname){
+                 flag=1;
+                 break;
+               }
+            }
+            if(!flag){
+              self.selectApis.push({fname:item.fname,fapiid:item.uid});
+            } 
+        };
+        self.destroyApi=function(){
+            self.selectApis.remove(this);
+        }
+        self.submitApiGroup=function(forElement){
+           //提交表单
+           var formData=$('#api_group_form').serialize();
+           console.log(formData);
+           var url;
+           if($("input[name='']").val()!="0"){
+              url="/update/z_api_group";
+           }else{
+              url="/add/z_api_group";
+           }
+
+           $.ajax({
+              url:url,
+              data:formData,
+              dataType:'json',
+              type:'post',
+              success:function(result){
+                  if(result.code){
+                     $("#table_api_group").datagrid('reload');
+                  }else{
+                     $.messager.show({   
+                        title: 'Error',
+                        msg: result.msg
+                     });
+                  }
+              }
+           });
+        }
+
+        //生成apiarr
+        self.api_array=ko.pureComputed({
+           read: function(){
+               return JSON.stringify(self.selectApis());
+              },
+           owner:this
+        });
+
+        self.chaneSelectApis= function(val){
+              var hasSelectApis=eval("("+val+")");
+              self.selectApis(hasSelectApis);
+        },
+        self.addApiGroup=function(){
+            $("#api_group_form")[0].reset();
+            $("#api_group_fieldset legend").text("接口添加");
+            self.selectApis.removeAll();
+        }
+    };
+
+    ko.applyBindings(viewModel);
+    viewModel.loadAllApis();
+
+    function destroyApiGroup(){
+        var row = $('#table_api_group').datagrid('getSelected');
+        $.ajax({
+            url:"/delete/z_api_group?uid="+row.uid,
+            dataType:"json",
+            type:'get',
+            success:function(result){
+                if (result.code){
+                    $('#table_api_group').datagrid('reload');          
+                } else {
+                    $.messager.show({   
+                        title: 'Error',
+                        msg: result.msg
+                    });
+                }
+            }
+        });
+     }
+
+    //表格操作  
+    $('#table_api_group').datagrid({
+         url:'/get/z_api_group?_field=fname,fdescription,fapiarr,fstatus',
+         idField:'uid',
+         fit:true,
+         remoteSort:false,
+         fitColumns:false,
+         singleSelect:true,
+         pagination:true, //客户端分页
+         pageSize:30,
+         pageList:[20,30,40,50],
+         toolbar:"#group_api_tb",
+         columns:[[
+             {field:'uid',title:'ID',width:80,sortable:true},
+             {field:'fname',title:'名称',width:100,sortable:true},
+             {field:'fdescription',title:'描述',width:100,sortable:true},
+             {field:'fapiarr',title:'字段',width:100,sortable:true,},     
+             {field:'fstatus',title:'是否启用',width:100,sortable:true,formatter:boolFormatter},
+         ]],
+         loadFilter:pagerFilter,
+         onClickRow:function(index,row){
+              for(var key in row){
+                  if(key!="fstatus"){
+                    $('input[name='+key+']').val(row[key]);
+                  }else{
+                    console.log(row[key]);
+                    $('input[name="fstatus"]').eq(1-row[key]).attr("checked",true);
+                  }
+               }
+               $("#api_group_fieldset legend").text("接口编辑");
+               viewModel.chaneSelectApis(row.fapiarr);
+         }
+     });
+
+    function boolFormatter(val,row){
+      if(val=="1"){
+        return "是";
+      }else if(val=="0"){
+        return "否";
+      }else{
+        return "";
+      }
+    }
+
+    function pagerFilter(data){
+        if (typeof data.length == 'number' && typeof data.splice == 'function'){
+          data = {
+            total: data.length,
+            rows: data
+          }
+        }
+
+        var dg = $(this);
+        var opts = dg.datagrid('options');
+        var pager = dg.datagrid('getPager');
+        pager.pagination({
+          onSelectPage:function(pageNum, pageSize){
+            opts.pageNumber = pageNum;
+            opts.pageSize = pageSize;
+            pager.pagination('refresh',{
+              pageNumber:pageNum,
+              pageSize:pageSize
+            });
+            dg.datagrid('loadData',data);
+          }
+        });
+
+        if (!data.originalRows){
+          data.originalRows = (data.rows);
+        }
+        var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+        var end = start + parseInt(opts.pageSize);
+        data.rows = (data.originalRows.slice(start, end));
+        return data;
+    }
+</script>
+</body>
+</html>

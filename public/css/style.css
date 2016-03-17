@@ -1,0 +1,125 @@
+body {
+  padding:0px;
+  margin:0px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00b7ff;
+}
+
+#fm{
+    margin:0;
+    padding:10px 30px;
+}
+.ftitle{
+    font-size:14px;
+    font-weight:bold;
+    padding:5px 0;
+    margin-bottom:10px;
+    border-bottom:1px solid #ccc;
+}
+.fitem{
+    margin-bottom:5px;
+}
+.fitem label{
+    display:inline-block;
+    width:80px;
+}
+.fitem input{
+    width:160px;
+}
+
+.tree-node-selected{
+  background: #64CDF4;
+  height: 24px;
+}
+.datagrid-row-selected{
+  background: #64CDF4;
+}
+
+.layout-split-north{
+  border-bottom: none;
+}
+
+.panel-body{
+  border-color:#E6E6E6;
+}
+
+.layout-split-west {
+    border-right: 3px solid #eee;
+}
+
+.margin-top10{
+  margin-top: 10px;
+}
+.none{
+  display: none;
+}
+.margin-left10{
+  margin-left: 10px;
+}
+.table_select input{
+  width: 400px;
+} 
+.api_desc input{
+  width:442px;
+}
+input[type="text"]:focus{
+  border-color: red !important;
+}
+.deal-button{
+  margin-bottom:10px;
+}
+.input-line{
+  margin-bottom: 10px;
+}
+.input-line input{
+  display: inline-block;
+  width:100px;
+}
+.form-fieldset{
+  border:1px solid #c5c5c5;
+  height:700px;
+}
+.form-fieldset legend{
+  font-weight: bold;
+  font-size: 18px;
+}
+.none{
+  display:none !important;
+}
+#table_name{
+  width: 300px;
+}
+#field{
+  width: 300px;
+}
+.tag{
+  color: #fff !important;
+  text-align: center;
+  padding:5px;
+  height:14px;
+  line-height: 14px;
+  font-weight:100;
+}
+.color1{
+   background-color: #e67e22;
+}
+.color2{
+   background-color: #f1c40f;
+}
+.color3{
+  background-color: #2ecc71;
+}
+.color4{
+  background-color: #8e44ad;
+}
+.color5{
+  background-color: #2980b9;
+}
+.color6{
+  background-color: #34495e;
+}
+.sui-close:hover,.sui-close:focus{
+  color:#FFF;
+}

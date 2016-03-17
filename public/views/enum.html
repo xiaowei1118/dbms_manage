@@ -1,0 +1,428 @@
+<<!DOCTYPE html>
+<html>
+<head>
+  <title>枚举表</title>
+  <meta chaset="utf-8">
+  <link rel="stylesheet" type="text/css" href="/themes/bootstrap/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/themes/icon.css">
+  <script type="text/javascript" src="/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/sui.min.js"></script>
+  <script type="text/javascript" src="/js/jquery.easyui.min.js"></script>
+  <script type="text/javascript" src="/js/easyui-lang-zh_CN.js"></script>
+  
+  <script type="text/javascript" src="/js/knockout.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/css/sui.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/sui-append.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true">
+       <div data-options="region:'north',split:true" style="height:40px;border:none">
+       	 <h3 style="height:10px;line-height:10px;margin-left:20px">以下为联动表格</h3>
+       </div>
+       <div data-options="region:'west',split:true" style="width:500px">
+          <table id="master_table_2">
+       	   </table>
+       </div>
+     <div id="master_tb_2">
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="addEntity_2()">添加</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editEntity_2()">编辑</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyEntity_2()">删除</a>
+     </div> 
+
+       <div id="dlg_2" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+                  closed="true" buttons="#dlg_2-buttons" data-options="modal:true">
+              <div class="ftitle">枚举</div>
+              <form id="fm_2" method="post" novalidate>
+                  <div class="fitem">
+                      <label>ID:</label>
+                      <input name="uid" class="easyui-textbox" readonly>
+                  </div>
+                  <div class="fitem">
+                      <label>名称:</label>
+                      <input name="fname" class="easyui-textbox" required="true">
+                  </div>      
+                  <div class="fitem">
+                      <label>类型:</label>
+                      <input name="ftype" class="easyui-combobox" required="true">
+                  </div>
+              </form>
+          </div>
+          <div id="dlg_2-buttons">
+              <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveEntity_2()" style="width:90px">保存</a>
+              <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_2').dialog('close')" style="width:90px">取消</a>
+          </div>
+
+       <div data-options="region:'center'">
+       	   <table id="link_table_2">
+
+       	   </table>
+       </div>
+      <div id="tb_2" style="height:auto">
+  			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true" onclick="append_2()">添加</a>
+  			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true" onclick="removeit_2()">删除</a>
+  			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="accept_2()">保存</a>
+  			<a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="reject_2()">取消</a>
+	   </div>
+   </div>
+   <script type="text/javascript">
+        var editIndex = undefined;
+        var masterTableUid=undefined;
+        var inlineComboxData=[];
+        var windowComboxData=getFtypeData(5);
+        
+        $(".easyui-combobox").combobox({data:windowComboxData, valueField:'fvalue',
+              textField:'fname'});
+
+   		  $('#master_table_2').datagrid({
+   		    url:'/get/z_enum?_field=fname,ftype',
+   		    idField:'uid',
+   		    fit:true,
+   		    remoteSort:false,
+   		    fitColumns:false,
+   		    singleSelect:true,
+   		    pagination:true,
+   		    pageSize:30,
+   		    pageList:[20,30,40,50],
+   		    toolbar:"#master_tb_2",
+   		    columns:[[
+   		        {field:'uid',title:'ID',width:80,sortable:true},
+   		        {field:'fname',title:'名称',width:100,sortable:true}, 
+   		        {field:'ftype',title:'类型',width:100,sortable:true,formatter:masterTableTypeFormatter},
+          ]],
+   		    onClickRow:function(index,row){
+   		    	$('#link_table_2').datagrid('rejectChanges');  //取消上次的编辑状态 	
+   		    	editIndex=undefined;                        //将编辑的行索引置为初始状态
+   		    	masterTableUid=row.uid;
+
+            inlineComboxData=getFtypeData(2);
+            console.log(inlineComboxData);
+   		    	$('#link_table_2').datagrid({
+   		    		 url:'/get/z_enumentry?_field=fenum,fname,fvalue,fappend_2&fenum='+row.uid,
+    		         queryParams:{method:'get', fentityuid:row.uid}
+    		    });	
+
+           
+   		    },
+   		    loadFilter:pagerFilter
+   		});
+      
+   		$('#link_table_2').datagrid({
+   			idField:'uid',
+   			fit:true,
+   			fitColumns:false,
+   			remoteSort:false,
+   			toolbar:"#tb_2",
+   			singleSelect:true,
+   			columns:[[
+   			    {field:'uid',title:'ID',width:80,sortable:true},
+   			    {field:'fname',title:'名称',width:100,sortable:true,editor:{type:'text'}},
+   			    {field:'fenum',title:'Fenum',width:100,sortable:true,editor:{type:'text'}},
+            {field:'fvalue',title:'值',width:100,sortable:true,editor:{type:'text'}},
+            {field:'fappend_2',title:'附加值',width:100,sortable:true,editor:{type:'text'}},
+
+   			]],
+   			pagination:true,
+   		    pageSize:30,
+   		    pageList:[20,30,40,50],
+   			loadFilter:pagerFilter,
+   			iconCls: 'icon-edit',
+   			onClickRow:function(index,row){
+   				if (editIndex != index){
+   					if (endEditing_2()){
+   						$('#link_table_2').datagrid('selectRow', index)
+   								.datagrid('beginEdit', index);
+   						    editIndex = index;
+
+   						  var ed = $('#link_table_2').datagrid('getEditor', {index:editIndex,field:'ftype'}); //编辑
+   					      //实现动态更新combobox的数据源            
+   					    $(ed.target).combobox({data:inlineComboxData});
+                $(ed.target).combobox("setValue",row.ftype);  //将当前的值放进去做默认值
+   					} else {
+   						$('#link_table_2').datagrid('selectRow', editIndex);
+   					}
+   				}
+   			}
+   		});
+
+		//从表的增删查改操作
+    //
+		function endEditing_2(){
+			if (editIndex == undefined){return true}
+			if ($('#link_table_2').datagrid('validateRow', editIndex)){
+				$('#link_table_2').datagrid('endEdit', editIndex);
+				editIndex = undefined;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		//添加
+		function append_2(){
+			if (endEditing_2()){
+				$('#link_table_2').datagrid('appendRow',{status:'_add'});
+				editIndex = $('#link_table_2').datagrid('getRows').length-1;
+				$('#link_table_2').datagrid('selectRow', editIndex)
+						.datagrid('beginEdit', editIndex);
+			}
+		}
+		//删除
+		function removeit_2(){
+			if (editIndex == undefined){
+				return
+			}
+			$('#link_table_2').datagrid('cancelEdit', editIndex)
+					.datagrid('deleteRow', editIndex);
+			editIndex = undefined;
+		}
+		//保存
+		function accept_2(){
+			$('#link_table_2').datagrid('endEdit',editIndex);
+			//删除data
+			var deleteRows=$('#link_table_2').datagrid('getChanges','deleted');
+			if(deleteRows.length>0){
+				deleteRows.map(function(item){
+					item['action']="deleted";
+				});
+			}
+			
+			//插入data
+			var insertRows=$('#link_table_2').datagrid('getChanges','inserted');
+			if(insertRows.length>0){
+				insertRows.map(function(item){
+					item['action']="inserted";
+					item['fentityuid']=masterTableUid;  //插入要添加与主表的关联字段值
+				});
+			}
+
+			//更新data
+			var updateRows=$('#link_table_2').datagrid('getChanges','updated');
+			if(updateRows.length>0){
+				updateRows.map(function(item){
+					item['action']="updated";
+				});
+			}
+		    
+			var rows=deleteRows.concat(insertRows).concat(updateRows);
+			
+			if (endEditing_2()){
+				//ajax
+				$.ajax({
+					type:'post',
+					url:"/admin/onceEdit/z_enumentry",
+					data:JSON.stringify(rows),
+					contentType:"application/json",
+					dataType:'json',
+					success:function(data){
+						$('#link_table_2').datagrid('acceptChanges');    //页面保存此次更改		
+						$('#link_table_2').datagrid('reload');
+					}
+
+				});
+				
+			}
+		}
+
+		//取消
+		function reject_2(){
+			$('#link_table_2').datagrid('rejectChanges');
+			editIndex = undefined;
+		}
+		
+
+		//主表操作，增删查改
+    var url;
+    function addEntity_2(){
+        $('#dlg_2').dialog({left:200,top:300}).dialog('open').dialog('setTitle','添加实体');
+        $('#fm_2').form('clear');
+        $('#fm_2 div:first').css('disabled',true).css('display','none');  //隐藏id项
+        url = '/add/z_entity'; 
+    }
+    function editEntity_2(){
+    	$('#fm_2 div:first').css('disabled',false).css('display','block');  //显示id项
+        var row = $('#master_table_2').datagrid('getSelected');
+        if(row!=null){
+            $('#dlg_2').dialog({left:200,top:300}).dialog('open').dialog('setTitle','编辑实体');
+            $('#fm_2').form('load',row);
+            url='/update/z_enum';
+        }else{
+        	$.messager.show({
+        		title:'提示',
+        		msg:'请选中一条记录再编辑',
+        	});
+        }
+    }
+    function saveEntity_2(){
+        $('#fm_2').form('submit',{
+            url: url,
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success: function(result){
+                var result = eval('('+result+')');
+                if (result.errorMsg){
+                    $.messager.show({
+                        title: 'Error',
+                        msg: result.errorMsg
+                    });
+                } else {
+                    $('#dlg_2').dialog('close');                 
+                    $('#master_table_2').datagrid('reload');    
+                }
+            }
+        });
+    }
+    function destroyEntity_2(){
+        var row = $('#master_table_2').datagrid('getSelected');
+        if (row){
+            $.messager.confirm('Confirm','你确定要删除吗?',function(r){
+                if (r){
+                	//删除
+                    $.post('/delete/z_entity',{uid:row.uid},function(result){
+                        if (result){
+                            $('#master_table_2').datagrid('reload');    
+                        } else {
+                            $.messager.show({   
+                                title: 'Error',
+                                msg: result.errorMsg
+                            });
+                        }
+                    },'json');
+                }
+            });
+        }
+    }
+    
+          function pagerFilter(data){
+          if (typeof data.length == 'number' && typeof data.splice == 'function'){
+            data = {
+              total: data.length,
+              rows: data
+            }
+          }
+
+          var dg = $(this);
+          var opts = dg.datagrid('options');
+          var pager = dg.datagrid('getPager');
+          pager.pagination({
+            onSelectPage:function(pageNum, pageSize){
+              opts.pageNumber = pageNum;
+              opts.pageSize = pageSize;
+              pager.pagination('refresh',{
+                pageNumber:pageNum,
+                pageSize:pageSize
+              });
+              dg.datagrid('loadData',data);
+            }
+          });
+
+          if (!data.originalRows){
+            data.originalRows = (data.rows);
+          }
+          var start = (opts.pageNumber-1)*parseInt(opts.pageSize);
+          var end = start + parseInt(opts.pageSize);
+          data.rows = (data.originalRows.slice(start, end));
+          return data;
+        }
+
+        //格式化column为bool值的列
+            function boolFormatter(val,row){
+              if(val=="1"){
+                return "是";
+              }else if(val=="0"){
+                return "否";
+              }else{
+                return "";
+              }
+            }
+
+            //格式化type类型
+            function LinkTableTypeFormatter(val,row){
+               var text=val;
+               inlineComboxData.forEach(function(item){
+                  if(val==item.fvalue){
+                     text=item.fname;
+                  }
+               });
+               return text;
+            }
+
+          function LinkTableEntityFormatter(val,row){
+            var text=val;
+            FentityInlineComboxData.forEach(function(item){
+              if(val==item.uid){
+                text=item.fname;
+              }
+            });
+            return text;
+          }
+
+          function LinkTableEnumFormatter(val,row){
+            var text=val;
+            FenumInlineComboxData.forEach(function(item){
+              if(val==item.uid){
+                text=item.fname;
+              }
+            });
+            return text;
+          }
+
+            function masterTableTypeFormatter(val,row){
+               var text=val;
+               windowComboxData.forEach(function(item){
+                  if(val==item.fvalue){
+                     text=item.fname;
+                  }
+               });
+               return text;
+            }
+
+            //获取ftype中值对应的text
+            function getFtypeData(fenum){
+                var data;
+                var url="/get/z_enumentry?_field=fvalue,fname,fappend&fenum="+fenum;
+
+                if(fenum==1){
+                  url+="&fvalue=!1";
+                }
+
+                $.ajax({
+                  url:url,
+                  dataType:'json',
+                  async:false,
+                  success:function(d){
+                   data=d;
+                 }
+              });
+                return data;
+            }
+
+            function getFentityData(){
+              var data;
+                $.ajax({
+                  url:"/get/z_entity?_field=fname&ftype=1",
+                  dataType:'json',
+                  async:false,
+                  success:function(d){
+                   data=d;
+                 }
+              });
+                return data;
+            }
+           function getFenumData(){
+               var data;
+               $.ajax({
+                  url:"/get/z_enum?_field=fname",
+                  dataType:'json',
+                  async:false,
+                  success:function(d){
+                    data=d;
+                 }
+               });
+               return data;
+           } 
+   </script>
+</body>
+</html>
